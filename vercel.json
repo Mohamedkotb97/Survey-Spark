@@ -5,8 +5,8 @@
   "framework": null,
   "functions": {
     "api/index.ts": {
-      "includeFiles": "server/**",
-      "excludeFiles": "server/**/*.test.ts"
+      "includeFiles": "{server,shared}/**",
+      "excludeFiles": "**/*.test.ts"
     }
   },
   "rewrites": [
