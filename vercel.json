@@ -3,10 +3,19 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": null,
-  "rewrites": [
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "dist/public/**"
+    }
+  },
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/api"
+      "src": "/api/(.*)",
+      "dest": "/api"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/api"
     }
   ]
 }
