@@ -6,8 +6,7 @@
   "outputDirectory": null,
   "functions": {
     "api/index.ts": {
-      "includeFiles": "{server,shared,dist}/**",
-      "excludeFiles": "**/*.test.ts"
+      "includeFiles": "dist/**"
     }
   },
   "routes": [
