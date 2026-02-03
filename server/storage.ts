@@ -9,7 +9,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Define CSV path - one level up from server (root)
-const CSV_FILE_PATH = path.join(__dirname, "..", "survey_responses.csv");
+// For Vercel, use process.cwd() to get the project root
+const basePath = process.env.VERCEL ? process.cwd() : path.join(__dirname, "..");
+const CSV_FILE_PATH = path.join(basePath, "survey_responses.csv");
 
 const CSV_HEADERS = [
   "timestamp",
