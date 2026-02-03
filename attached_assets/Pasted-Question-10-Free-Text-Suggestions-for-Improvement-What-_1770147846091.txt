@@ -1,0 +1,124 @@
+Question 10 – Free Text
+
+Suggestions for Improvement
+What improvements would you suggest for our service, particularly regarding the security advisor role?
+
+Use a textarea
+
+Optional but encouraged
+
+Limit to 1000 characters
+
+4. Submission & Thank You Page
+
+After the last question:
+
+Save all collected data to a CSV file
+
+Show a Thank You screen with:
+
+“Thank you for your feedback!”
+
+A short friendly message
+
+A checkmark or success animation
+
+5. CSV Storage Requirements
+
+File name: survey_responses.csv
+
+If the file does not exist, create it with headers.
+
+Append new responses without overwriting existing data.
+
+CSV columns must be in this exact order:
+
+timestamp
+name
+company
+overall_experience
+service_quality
+timeliness
+communication
+professionalism
+issue_resolution
+ease_of_access
+value_added_by_security_advisor
+efficiency_of_security_advisor
+suggestions
+
+
+Timestamp should be saved in UTC format.
+
+6. Backend API Endpoints
+
+Create the following Flask routes:
+
+GET /
+
+Serves the main survey webpage.
+
+POST /submit
+
+Accepts JSON data from the frontend.
+
+Validates required fields.
+
+Saves data into the CSV file.
+
+Returns success response.
+
+GET /download-csv
+
+Returns the CSV file as a downloadable attachment.
+
+Make the URL simple and easy to access.
+
+7. Frontend UI / UX Requirements
+
+Centered card layout
+
+Smooth transitions between questions
+
+Progress bar or step indicator
+
+Disable “Next” button until an option is selected
+
+Mobile-friendly design
+
+Use soft colors and modern fonts
+
+Hover effects and subtle animations
+
+Use emojis or icons sparingly for friendliness
+
+8. Project Structure
+
+Organize the Replit project like this:
+
+/
+├── app.py
+├── survey_responses.csv
+├── templates/
+│   └── index.html
+├── static/
+│   ├── style.css
+│   └── script.js
+
+9. Hosting
+
+Ensure the app runs on Replit without extra configuration.
+
+Use 0.0.0.0 and dynamic port support.
+
+Include instructions in comments on how to run the app.
+
+10. Code Quality
+
+Write clean, readable, and well-commented code.
+
+Handle errors gracefully.
+
+Do not use external paid services.
+
+Keep everything self-contained.
