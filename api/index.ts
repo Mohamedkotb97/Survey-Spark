@@ -87,18 +87,19 @@ function escapeCsvField(field: string | number): string {
 }
 
 // Schema for survey submission
+// Note: Rating values are 0-9 based on frontend rating options
 const surveySchema = z.object({
   name: z.string().min(1),
   company: z.string().min(1),
-  overallExperience: z.number().min(1).max(5),
-  serviceQuality: z.number().min(1).max(5),
-  timeliness: z.number().min(1).max(5),
-  communication: z.number().min(1).max(5),
-  professionalism: z.number().min(1).max(5),
-  issueResolution: z.number().min(1).max(5),
-  easeOfAccess: z.number().min(1).max(5),
-  valueAdded: z.number().min(1).max(5),
-  efficiency: z.number().min(1).max(5),
+  overallExperience: z.number().min(0).max(9),
+  serviceQuality: z.number().min(0).max(9),
+  timeliness: z.number().min(0).max(9),
+  communication: z.number().min(0).max(9),
+  professionalism: z.number().min(0).max(9),
+  issueResolution: z.number().min(0).max(9),
+  easeOfAccess: z.number().min(0).max(9),
+  valueAdded: z.number().min(0).max(9),
+  efficiency: z.number().min(0).max(9),
   suggestions: z.string().optional(),
 });
 
