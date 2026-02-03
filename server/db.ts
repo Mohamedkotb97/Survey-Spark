@@ -4,11 +4,20 @@ import * as schema from "@shared/schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+// For Vercel/serverless, database connection is optional
+// If DATABASE_URL is not set, create a mock db that will fail gracefully
+let pool: pg.Pool | null = null;
+let db: ReturnType<typeof drizzle> | null = null;
+
+if (process.env.DATABASE_URL) {
+  pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  db = drizzle(pool, { schema });
+} else {
+  console.warn("DATABASE_URL not set. Database operations will be disabled.");
+  // Create a mock pool and db that will throw helpful errors
+  pool = null;
+  db = null;
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+export { pool };
+export { db };

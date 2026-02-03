@@ -46,11 +46,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createSurveyResponse(insertResponse: InsertSurveyResponse): Promise<SurveyResponse> {
-    // 1. Save to Database (Reliability)
-    const [result] = await db
-      .insert(surveyResponses)
-      .values(insertResponse)
-      .returning();
+    // 1. Save to Database (Reliability) - if database is available
+    let result: SurveyResponse;
+    if (db) {
+      [result] = await db
+        .insert(surveyResponses)
+        .values(insertResponse)
+        .returning();
+    } else {
+      // If no database, create a mock result for CSV-only mode
+      result = {
+        id: Date.now(),
+        ...insertResponse,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as SurveyResponse;
+    }
 
     // 2. Append to CSV (Requirement)
     const csvRow = [
