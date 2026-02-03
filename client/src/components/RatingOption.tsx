@@ -19,7 +19,7 @@ export function RatingOption({ label, value, isSelected, onSelect, emoji }: Rati
         "flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-200 gap-3 w-full",
         isSelected
           ? "border-primary bg-primary/5 shadow-md shadow-primary/10"
-          : "border-transparent bg-secondary hover:bg-secondary/80 hover:border-border"
+          : "border-transparent bg-background hover:bg-muted hover:border-border"
       )}
     >
       <span className="text-4xl filter drop-shadow-sm">{emoji}</span>

@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ChevronRight, CheckCircle2, Star, ArrowRight } from "lucide-react";
+import orangeLogo from "@assets/Orange_Cyberdefense_RGB_Master_Logo_Black_Text_1770148513417.png";
 
 // --- Configuration & Types ---
 
@@ -117,8 +118,12 @@ export default function Survey() {
         {currentStep.type === "welcome" && (
           <StepCard key="welcome">
             <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary mb-4">
-                <Star className="w-10 h-10 fill-primary" />
+              <div className="flex justify-center mb-8">
+                <img 
+                  src={orangeLogo} 
+                  alt="Orange Cyberdefense Logo" 
+                  className="h-24 md:h-32 object-contain"
+                />
               </div>
               <h1 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight">
                 Customer Satisfaction Survey
