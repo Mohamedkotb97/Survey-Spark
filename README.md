@@ -21,7 +21,7 @@ A modern survey application built with React, Express, and TypeScript.
 ### Prerequisites
 
 - Node.js 20+
-- PostgreSQL database
+- PostgreSQL database (optional - app works with CSV-only mode)
 
 ### Installation
 
@@ -36,9 +36,13 @@ cd Survey-Spark
 npm install
 ```
 
-3. Set up environment variables (create a `.env` file)
+3. Set up environment variables (create a `.env` file):
+```bash
+# Optional: Add database connection string
+DATABASE_URL=postgresql://user:password@host:port/database
+```
 
-4. Run database migrations:
+4. Run database migrations (if using database):
 ```bash
 npm run db:push
 ```
@@ -47,6 +51,25 @@ npm run db:push
 ```bash
 npm run dev
 ```
+
+## Database Setup (Optional)
+
+The app works in CSV-only mode, but you can add a database for persistent storage.
+
+### Recommended: Neon (Free PostgreSQL)
+
+1. Go to [neon.tech](https://neon.tech) and sign up
+2. Create a new project
+3. Copy the connection string (looks like: `postgresql://user:password@host/dbname`)
+4. Add it to Vercel:
+   - Go to your Vercel project → Settings → Environment Variables
+   - Add `DATABASE_URL` with your connection string
+   - Redeploy your application
+
+### Other Free Database Options:
+- **Supabase**: [supabase.com](https://supabase.com) - Free PostgreSQL with 500MB
+- **Railway**: [railway.app](https://railway.app) - $5 free credit/month
+- **Render**: [render.com](https://render.com) - Free PostgreSQL (spins down when idle)
 
 ## Scripts
 
