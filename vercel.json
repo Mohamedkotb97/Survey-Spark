@@ -2,21 +2,11 @@
   "version": 2,
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": null,
-  "outputDirectory": null,
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": "dist/**"
-    }
-  },
-  "routes": [
+  "outputDirectory": "dist/public",
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api"
+      "source": "/api/:path*",
+      "destination": "/api"
     }
   ]
 }
