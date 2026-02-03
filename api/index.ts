@@ -1,9 +1,5 @@
-import app, { initializeApp } from "../server/index";
+// Import from source - Vercel will compile TypeScript
+// Make sure server directory is included in the function
+import app from "../server/index";
 
-// Ensure app is initialized before handling requests
-if (process.env.VERCEL) {
-  initializeApp().catch(console.error);
-}
-
-// Vercel serverless function handler
 export default app;

@@ -5,17 +5,14 @@
   "framework": null,
   "functions": {
     "api/index.ts": {
-      "includeFiles": "dist/public/**"
+      "includeFiles": "server/**",
+      "excludeFiles": "server/**/*.test.ts"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api"
+      "source": "/(.*)",
+      "destination": "/api"
     }
   ]
 }
