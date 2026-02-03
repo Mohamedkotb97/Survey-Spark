@@ -8,6 +8,7 @@ import path from "path";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { pgTable, text, serial, integer, timestamp } from "drizzle-orm/pg-core";
+import { desc } from "drizzle-orm";
 
 const { Pool } = pg;
 
@@ -87,21 +88,34 @@ function escapeCsvField(field: string | number): string {
 }
 
 // Schema for survey submission
-// Note: Rating values are 0-9 based on frontend rating options
+// Rating values are 1-5
 const surveySchema = z.object({
   name: z.string().min(1),
   company: z.string().min(1),
-  overallExperience: z.number().min(0).max(9),
-  serviceQuality: z.number().min(0).max(9),
-  timeliness: z.number().min(0).max(9),
-  communication: z.number().min(0).max(9),
-  professionalism: z.number().min(0).max(9),
-  issueResolution: z.number().min(0).max(9),
-  easeOfAccess: z.number().min(0).max(9),
-  valueAdded: z.number().min(0).max(9),
-  efficiency: z.number().min(0).max(9),
+  overallExperience: z.number().min(1).max(5),
+  serviceQuality: z.number().min(1).max(5),
+  timeliness: z.number().min(1).max(5),
+  communication: z.number().min(1).max(5),
+  professionalism: z.number().min(1).max(5),
+  issueResolution: z.number().min(1).max(5),
+  easeOfAccess: z.number().min(1).max(5),
+  valueAdded: z.number().min(1).max(5),
+  efficiency: z.number().min(1).max(5),
   suggestions: z.string().optional(),
 });
+
+// Admin password
+const ADMIN_PASSWORD = "OCD$survey$2026";
+
+// Simple password check middleware
+function checkAdminPassword(req: any, res: any, next: any) {
+  const password = req.headers.authorization?.replace("Bearer ", "") || req.query.password as string;
+  if (password === ADMIN_PASSWORD) {
+    next();
+  } else {
+    res.status(401).json({ error: "Unauthorized" });
+  }
+}
 
 // API Routes
 
@@ -165,8 +179,79 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
-// Download CSV - generate from database if available, otherwise use file
-app.get("/api/download-csv", async (req, res) => {
+// Get all survey responses (protected)
+app.get("/api/admin/responses", checkAdminPassword, async (req, res) => {
+  try {
+    if (!db) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
+    const responses = await db.select().from(surveyResponses).orderBy(desc(surveyResponses.createdAt));
+    res.json(responses);
+  } catch (error) {
+    console.error("Error fetching responses:", error);
+    res.status(500).json({ error: "Failed to fetch responses" });
+  }
+});
+
+// Get analytics (protected)
+app.get("/api/admin/analytics", checkAdminPassword, async (req, res) => {
+  try {
+    if (!db) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
+    const responses = await db.select().from(surveyResponses);
+    const total = responses.length;
+    
+    if (total === 0) {
+      return res.json({
+        total: 0,
+        averageRatings: {},
+        dateRange: null,
+        responsesByDate: [],
+      });
+    }
+    
+    // Calculate averages
+    const fields = [
+      "overallExperience", "serviceQuality", "timeliness", "communication",
+      "professionalism", "issueResolution", "easeOfAccess", "valueAdded", "efficiency"
+    ];
+    
+    const averages: Record<string, number> = {};
+    fields.forEach(field => {
+      const sum = responses.reduce((acc, r) => acc + (r[field as keyof typeof r] as number), 0);
+      averages[field] = total > 0 ? Number((sum / total).toFixed(2)) : 0;
+    });
+    
+    // Date range
+    const dates = responses.map(r => r.createdAt ? new Date(r.createdAt).toISOString().split('T')[0] : null).filter(Boolean);
+    const dateRange = dates.length > 0 ? {
+      earliest: dates.sort()[0],
+      latest: dates.sort().reverse()[0]
+    } : null;
+    
+    // Responses by date
+    const responsesByDate: Record<string, number> = {};
+    dates.forEach(date => {
+      responsesByDate[date!] = (responsesByDate[date!] || 0) + 1;
+    });
+    
+    res.json({
+      total,
+      averageRatings: averages,
+      dateRange,
+      responsesByDate: Object.entries(responsesByDate).map(([date, count]) => ({ date, count })),
+    });
+  } catch (error) {
+    console.error("Error fetching analytics:", error);
+    res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+});
+
+// Download CSV - protected
+app.get("/api/admin/download-csv", checkAdminPassword, async (req, res) => {
   try {
     let csvContent = CSV_HEADERS + "\n";
     

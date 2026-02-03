@@ -17,11 +17,11 @@ import orangeLogo from "@assets/Orange_Cyberdefense_RGB_Master_Logo_Black_Text_1
 // --- Configuration & Types ---
 
 const ratingOptions = [
-  { label: "Very Dissatisfied", value: 0, emoji: "😡" },
+  { label: "Very Dissatisfied", value: 1, emoji: "😡" },
   { label: "Dissatisfied", value: 2, emoji: "🙁" },
-  { label: "Neutral", value: 5, emoji: "😐" },
-  { label: "Satisfied", value: 7, emoji: "🙂" },
-  { label: "Very Satisfied", value: 9, emoji: "🤩" },
+  { label: "Neutral", value: 3, emoji: "😐" },
+  { label: "Satisfied", value: 4, emoji: "🙂" },
+  { label: "Very Satisfied", value: 5, emoji: "🤩" },
 ];
 
 const steps = [
