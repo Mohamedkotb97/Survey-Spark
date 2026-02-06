@@ -260,7 +260,7 @@ export default function Survey() {
                 <Button 
                   size="lg" 
                   onClick={handleNext}
-                  disabled={submitMutation.isPending}
+                  disabled={submitMutation.isPending || !watch("suggestions") || watch("suggestions")?.length < 3}
                   className="rounded-full px-8 bg-gradient-to-r from-primary to-purple-600 hover:to-purple-700 shadow-lg shadow-primary/25"
                 >
                   {submitMutation.isPending ? "Submitting..." : "Submit Survey"}
