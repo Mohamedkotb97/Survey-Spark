@@ -237,7 +237,7 @@ export default function Survey() {
                 <h2 className="text-2xl md:text-3xl font-bold leading-tight">
                   {currentStep.question}
                 </h2>
-                <p className="text-muted-foreground text-sm">This is optional, but we'd love to hear your ideas.</p>
+                <p className="text-muted-foreground text-sm">Please share your suggestions for improvement.</p>
               </div>
 
               <div className="max-w-xl mx-auto">
