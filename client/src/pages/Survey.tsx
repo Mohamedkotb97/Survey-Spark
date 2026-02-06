@@ -53,7 +53,7 @@ const formSchema = z.object({
   easeOfAccess: z.number(),
   valueAdded: z.number(),
   efficiency: z.number(),
-  suggestions: z.string().min(1, "Suggestions are required"),
+  suggestions: z.string().min(3, "Suggestions must be at least 3 characters"),
 });
 
 type FormData = z.infer<typeof formSchema>;

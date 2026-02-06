@@ -101,7 +101,7 @@ const surveySchema = z.object({
   easeOfAccess: z.number().min(1).max(5),
   valueAdded: z.number().min(1).max(5),
   efficiency: z.number().min(1).max(5),
-  suggestions: z.string().min(1, "Suggestions are required"),
+  suggestions: z.string().min(3, "Suggestions must be at least 3 characters"),
 });
 
 // Admin password
