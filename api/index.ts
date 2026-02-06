@@ -101,11 +101,12 @@ const surveySchema = z.object({
   easeOfAccess: z.number().min(1).max(5),
   valueAdded: z.number().min(1).max(5),
   efficiency: z.number().min(1).max(5),
-  suggestions: z.string().optional(),
+  suggestions: z.string().min(1, "Suggestions are required"),
 });
 
 // Admin password
 const ADMIN_PASSWORD = "OCD$survey$2026";
+const DELETE_PASSWORD = "delete$admin";
 
 // Simple password check middleware
 function checkAdminPassword(req: any, res: any, next: any) {
@@ -299,6 +300,34 @@ app.get("/api/admin/download-csv", checkAdminPassword, async (req, res) => {
   } catch (error) {
     console.error("CSV download error:", error);
     res.status(500).json({ error: "Failed to generate CSV" });
+  }
+});
+
+// Delete all survey responses (protected with delete password)
+app.delete("/api/admin/delete-all", checkAdminPassword, async (req, res) => {
+  try {
+    const deletePassword = req.headers["x-delete-password"] as string || req.body?.password;
+    
+    if (deletePassword !== DELETE_PASSWORD) {
+      return res.status(401).json({ error: "Invalid delete password" });
+    }
+    
+    if (!db) {
+      return res.status(500).json({ error: "Database not configured" });
+    }
+    
+    // Delete all responses from database
+    await db.delete(surveyResponses);
+    
+    // Also clear CSV file if it exists
+    if (fs.existsSync(CSV_FILE_PATH)) {
+      fs.writeFileSync(CSV_FILE_PATH, CSV_HEADERS + "\n");
+    }
+    
+    res.json({ success: true, message: "All survey responses deleted" });
+  } catch (error) {
+    console.error("Error deleting responses:", error);
+    res.status(500).json({ error: "Failed to delete responses" });
   }
 });
 

@@ -53,7 +53,7 @@ const formSchema = z.object({
   easeOfAccess: z.number(),
   valueAdded: z.number(),
   efficiency: z.number(),
-  suggestions: z.string().optional(),
+  suggestions: z.string().min(1, "Suggestions are required"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -65,9 +65,6 @@ export default function Survey() {
 
   const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      suggestions: "",
-    }
   });
 
   const currentStep = steps[currentStepIndex];
@@ -249,7 +246,11 @@ export default function Survey() {
                   className="min-h-[150px] text-lg p-4 resize-none bg-background"
                   {...register("suggestions")}
                   maxLength={1000}
+                  required
                 />
+                {errors.suggestions && (
+                  <p className="text-sm text-destructive mt-1">{errors.suggestions.message}</p>
+                )}
                 <div className="text-xs text-right text-muted-foreground mt-2">
                   {watch("suggestions")?.length || 0}/1000 characters
                 </div>

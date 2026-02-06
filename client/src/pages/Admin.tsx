@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, BarChart3, Users, Calendar, TrendingUp, Lock } from "lucide-react";
+import { Download, BarChart3, Users, Calendar, TrendingUp, Lock, Trash2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const ADMIN_PASSWORD = "OCD$survey$2026";
+const DELETE_PASSWORD = "delete$admin";
 
 interface SurveyResponse {
   id: number;
@@ -35,11 +37,14 @@ interface Analytics {
 }
 
 export default function Admin() {
+  const queryClient = useQueryClient();
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [storedPassword, setStoredPassword] = useState<string | null>(
     typeof window !== "undefined" ? localStorage.getItem("admin_password") : null
   );
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
 
   // Check if already authenticated
   if (storedPassword === ADMIN_PASSWORD && !isAuthenticated) {
@@ -93,6 +98,45 @@ export default function Admin() {
     window.location.href = `/api/admin/download-csv?password=${encodeURIComponent(ADMIN_PASSWORD)}`;
   };
 
+  // Delete all responses mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (deletePwd: string) => {
+      const res = await fetch("/api/admin/delete-all?password=" + encodeURIComponent(ADMIN_PASSWORD), {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Delete-Password": deletePwd,
+        },
+        body: JSON.stringify({ password: deletePwd }),
+      });
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        throw new Error(error.error || "Failed to delete");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-responses"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-analytics"] });
+      setShowDeleteDialog(false);
+      setDeletePassword("");
+      alert("All survey responses have been deleted successfully");
+    },
+    onError: (error: Error) => {
+      alert(error.message || "Failed to delete responses");
+    },
+  });
+
+  const handleDeleteAll = () => {
+    if (deletePassword === DELETE_PASSWORD) {
+      if (window.confirm("Are you absolutely sure you want to delete ALL survey responses? This action cannot be undone.")) {
+        deleteMutation.mutate(deletePassword);
+      }
+    } else {
+      alert("Incorrect delete password");
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
@@ -138,6 +182,14 @@ export default function Admin() {
             <Button onClick={handleDownload} variant="outline">
               <Download className="mr-2 h-4 w-4" />
               Download CSV
+            </Button>
+            <Button 
+              onClick={() => setShowDeleteDialog(true)} 
+              variant="destructive"
+              disabled={analytics?.total === 0}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete All
             </Button>
             <Button onClick={handleLogout} variant="outline">
               Logout
@@ -304,6 +356,47 @@ export default function Admin() {
             )}
           </CardContent>
         </Card>
+
+        {/* Delete Dialog */}
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete All Survey Responses</DialogTitle>
+              <DialogDescription>
+                This action will permanently delete all survey responses. This cannot be undone.
+                Please enter the delete password to confirm.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="delete-password">Delete Password</Label>
+                <Input
+                  id="delete-password"
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleDeleteAll()}
+                  placeholder="Enter delete password"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => {
+                setShowDeleteDialog(false);
+                setDeletePassword("");
+              }}>
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteAll}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending ? "Deleting..." : "Delete All"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
